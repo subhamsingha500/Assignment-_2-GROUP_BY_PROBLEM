@@ -1,0 +1,50 @@
+//scala
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+val spark = SparkSession.builder
+  .appName("Group_By2")
+  .getOrCreate()
+
+import spark.implicits._
+
+val data = Seq(
+    ("Laptop", "order_1", 2),
+    ("Phone", "order_2", 1),
+    ("T-Shirt", "order_1", 3),
+    ("Jeans", "order_3", 4),
+    ("Chair", "order_2", 2)
+).toDF("product", "order_id", "quantity")
+
+
+val groupByQuantity = data.groupBy("product").agg(sum("quantity").alias("total_sale")).orderBy(desc("total_sale"))
+
+val topFive = groupByQuantity.limit(5)
+
+
+
+topFive.show()
+
+//pyspark
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+
+spark = SparkSession.builder.appName("GroupBy").getOrCreate()
+
+data = [
+    ("Laptop", "order_1", 2),
+    ("Phone", "order_2", 1),
+    ("T-Shirt", "order_1", 3),
+    ("Jeans", "order_3", 4),
+    ("Chair", "order_2", 2)
+]
+
+df = spark.createDataFrame(data, ["product", "order_id", "quantity"])
+
+groupByQuantity = df.groupBy("product").agg(sum("quantity").alias("total_sale")).orderBy(desc("total_sale"))
+
+
+
+groupByQuantity.show()
