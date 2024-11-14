@@ -1,0 +1,49 @@
+//scala
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+
+val spark = SparkSession.builder
+  .appName("Group_By2")
+  .getOrCreate()
+
+import spark.implicits._
+
+
+val data = Seq(
+    ("order_1", 150),
+    ("order_2", 80),
+    ("order_3", 220),
+    ("order_4", 50)
+).toDF("order_id", "amount")
+
+
+val groupByOrder1 = data.groupBy("order_id").agg(sum("amount").alias("total"))
+
+val groupByOrder2 = groupByOrder1.withColumn("order_status", when(col("total")>200, "High").otherwise("Low"))
+
+groupByOrder2.show()
+
+//pyspark
+
+%python
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+
+spark = SparkSession.builder.appName("GroupBy").getOrCreate()
+
+data = [
+    ("order_1", 150),
+    ("order_2", 80),
+    ("order_3", 220),
+    ("order_4", 50)
+]
+
+df = spark.createDataFrame(data, ["order_id", "amount"])
+
+
+groupByOrder1 = df.groupBy("order_id").agg(sum("amount").alias("total"))
+
+groupByOrder2 = groupByOrder1.withColumn("order_status", when(col("total")>200, "High").otherwise("Low"))
+
+groupByOrder2.show()
